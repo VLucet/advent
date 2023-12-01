@@ -1,0 +1,10 @@
+Package: advent
+Type: Package
+Title: The goal of advent is to help with completing the advent of code 2023 challenges.
+Version: 0.1.0
+Description: The goal of advent is to help with completing the advent of code 2023 challenges.
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+Authors@R: 
+    person("Valentin", "Lucet", "valentin.lucet@gmail.com", role = "cre")
