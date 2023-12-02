@@ -72,4 +72,3 @@ sum(possible) == 2176
 
 # Part 2
 sum(game_summaries$blue_max * game_summaries$red_max * game_summaries$green_max) == 63700
-
