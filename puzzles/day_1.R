@@ -23,7 +23,7 @@ get_calibration_value <- function(the_line){
 
 cal_values <- sapply(input, FUN = get_calibration_value)
 
-## Answer to first part
+# Part 1
 sum(cal_values)
 
 number_words <- c("one", "two", "three", "four", "five",
@@ -92,5 +92,5 @@ stopifnot(sum(sapply(testset, FUN = get_calibration_value_again, number_words, r
 
 cal_values_again <- sapply(input, FUN = get_calibration_value_again, number_words, replaces)
 
-## Answer to second part
+# Part 2
 sum(cal_values_again)
