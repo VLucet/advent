@@ -13,6 +13,8 @@ test_input <- c(
   "Card 6: 31 18 13 56 72 | 74 77 10 23 35 67 36 11"
 )
 
+# -------------------------------------------------------------------------
+
 parse_line <- function(the_line){
   nocard <- unlist(strsplit(the_line, ": ", fixed = TRUE))[2]
   numbers <- unlist(strsplit(nocard, " | ", fixed = TRUE))
@@ -34,15 +36,11 @@ sum(scores)
 # Part 2
 cards <- rep(1, length(input))
 for (i in 1:length(cards)) {
-  print(i)
-  print(cards)
   reach_vec <- c(
     rep(0,i),
     rep(1,matches[i]),
     rep(0,length(cards) - matches[i] - i)
   )
-  print(reach_vec)
   cards <- cards + (reach_vec * cards[i])
-  print(cards)
 }
 sum(cards)
