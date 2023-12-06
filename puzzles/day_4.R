@@ -1,6 +1,6 @@
 library(advent)
 
-input <- get_puzzle_input(2023,4,cache = F)
+input <- get_puzzle_input(2023,4)
 
 stopifnot(length(input) == 209)
 
