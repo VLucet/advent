@@ -39,7 +39,7 @@ humidity-to-location map:
 ) |> strsplit("\n") |> unlist()
 
 # Part 1
-input_no_ret <- test_input[test_input != ""]
+# input_no_ret <- test_input[test_input != ""]
 input_no_ret <- input[input != ""]
 
 seeds_pos <- which(grepl("seeds:", input_no_ret, fixed = T))
@@ -121,40 +121,61 @@ find_overlap <- function(x, y) {
   # browser()
 
   if (y[1] > x[2] | x[1] > y[2]) {
-    return(list(inside = NULL,
-                outside = x))
+    ret <- list(inside = NULL,
+                outside = x)
   } else {
     inter <- c(max(x[1], y[1]),
                min(x[2], y[2]))
     if (all(x == inter)) {
-      return(list(inside = inter,
-                  outside = NULL))
+      ret <- list(inside = inter,
+                  outside = NULL)
     } else {
       if (y[1] <= x[1]) {
-        return(list(inside = inter,
-                    outside = c(y[2] + 1, x[2])))
+        ret <- list(inside = inter,
+                    outside = c(y[2] + 1, x[2]))
       } else if (y[2] >= x[2]) {
-        return(list(inside = inter,
-                    outside = c(x[1], y[1] - 1)))
+        ret <- list(inside = inter,
+                    outside = c(x[1], y[1] - 1))
       } else {
-        return(list(inside = inter,
+        ret <- list(inside = inter,
                     outside = list(c(x[1], y[1] - 1),
-                                   c(y[2] + 1, x[2]))))
+                                   c(y[2] + 1, x[2])))
       }
     }
 
   }
+
+  # browser()
+
+  unlisted <- unlist(unlist(ret))
+  stopifnot(min(unlisted) == x[1])
+  stopifnot(max(unlisted) == x[2])
+
+  sorted <- sort(unlisted)
+  diffed <- diff(sorted)
+
+  if (length(sorted) > 2) {
+    print(diffed)
+    middle <- diffed[2:(length(diffed) - 1)]
+    if (!all(middle == 1)) {
+      stopifnot(sum(middle != 1) == 1)
+    }
+  }
+
+  # browser()
+
+  return(ret)
 }
 
 my_fun <- function(){
 
-  # browser()
+  browser()
 
   all_ranges <- list()
 
   for (seed_range in range_list) { # range_list[1]) {
 
-    print(seed_range)
+    # print(seed_range)
     valid_ranges <- list(seed_range)
 
     for (map_id in 1:length(maps_mats_ranges)) {
@@ -166,7 +187,7 @@ my_fun <- function(){
 
       status_list <- list(to_map = valid_ranges,
                           mapped = list())
-      str(status_list)
+      # str(status_list)
 
       if (length(status_list$to_map) != 0) {
 
@@ -186,12 +207,14 @@ my_fun <- function(){
 
             if (is.null(overlap$inside)) {
 
+              print("No overlap")
+
             } else {
 
               # mapping
               current_range_mapped <- c(
-                set$to[1] + (overlap$inside[1] - set$from[1]),
-                set$to[1] + (overlap$inside[2] - set$from[1]))
+                set$to[1] + abs((overlap$inside[1] - set$from[1])),
+                set$to[1] + abs((overlap$inside[2] - set$from[1])))
 
               status_list$mapped <- append(status_list$mapped, list(current_range_mapped))
               status_list$to_map[[1]] <- NULL
@@ -214,30 +237,34 @@ my_fun <- function(){
           }
 
           if (length(status_list$to_map) > 0) {
-            if (is.list(status_list$to_map)) {
-              for (remaining_range in status_list$to_map) {
-                status_list$mapped <- append(status_list$mapped, list(remaining_range))
-              }
-            } else {
-              status_list$mapped <- append(status_list$mapped, list(status_list$to_map))
-            }
-
-            status_list$to_map <- list()
+            status_list$mapped <- append(status_list$mapped, list(current_range_mapped))
+            status_list$to_map[[1]] <- NULL
           }
 
         }
 
-        valid_ranges <- status_list$mapped
+        if (length(status_list$to_map) > 0) {
+          if (is.list(status_list$to_map)) {
+            for (remaining_range in status_list$to_map) {
+              status_list$mapped <- append(status_list$mapped, list(remaining_range))
+            }
+          } else {
+            status_list$mapped <- append(status_list$mapped, list(status_list$to_map))
+          }
+
+          status_list$to_map <- list()
+        }
+
+
       }
-      # print(valid_range)
+      valid_ranges <- status_list$mapped
     }
 
-    all_ranges <- append(all_ranges, list(valid_ranges))
+    all_ranges <- append(all_ranges, valid_ranges)
   }
 
   return(all_ranges)
 
 }
 
-out <- my_fun()
-sapply(out, \(x) unlist(x) |> min()) |> min()
+out <- my_fun() ; sapply(out, \(x) unlist(x) |> min()) |> min()
