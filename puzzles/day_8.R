@@ -103,52 +103,69 @@ lines_parsed
 starting_points_id <- which( (lapply(strsplit(names(lines_parsed), ""),
                                      \(x) x[3]) |> unlist()) == "A" )
 
-same_ends_in_Z <- function(node, starting_node){
+ends_in_Z <- function(node){
   unlist(strsplit(node, ""))[3] == "Z" # &
     # all(unlist(strsplit(node, ""))[1:2] == unlist(strsplit(starting_node, ""))[1:2])
 }
 
-walk_network_2 <- function(insts, map, start_ids = starting_points_id) {
+# walk_network_2 <- function(insts, map, start_ids = starting_points_id) {
+#
+#   # browser()
+#   starting_nodes <- names(map)[start_ids][names(map)[start_ids] != "AAA"]
+#
+#   nodes <- starting_nodes
+#
+#   # step_list <- c()
+#
+#   step <- 1
+#
+#   while (!all(mapply(nodes, starting_nodes,
+#                      FUN = ends_in_Z))) {
+#
+#     dir <- step %% length(insts)
+#     dir <- ifelse(dir == 0, length(insts), dir)
+#
+#     # node <- map[[node]][insts[dir]]
+#     nodes <- sapply(nodes, \(x) map[[x]][insts[dir]])
+#
+#     if (step %% 1000000 == 0) print(unname(nodes))
+#
+#     step <- step + 1
+#
+#     # if (any(mapply(nodes, starting_nodes,
+#     #                FUN = same_ends_in_Z))) {
+#     #   step_list <- c(step_list, step)
+#     #   print(step_list)
+#     #   if (length(step_list) == length(starting_nodes)) return(step_list)
+#     # }
+#   }
+#   return(step - 1)
+# }
+#
+# x <- walk_network_2(insts_parsed, lines_parsed)
 
-  # browser()
-  starting_nodes <- names(map)[start_ids][names(map)[start_ids] != "AAA"]
+# starts <- names(lines_parsed)[starting_points_id]
+# ends <- sapply(starts, function(x) {
+#   splitted <- strsplit(x, "") |> unlist()
+#   splitted[3] <- "Z"
+#   paste0(splitted, collapse = "")
+# }, simplify = F) |> unlist() |> unname()
+# mapply(FUN = walk_network, start = starts, end = ends)
 
-  nodes <- starting_nodes
-
-  # step_list <- c()
-
+walk_network_3 <- function(start = "AAA",
+                           insts = insts_parsed, map = lines_parsed) {
+  node <- start
   step <- 1
-
-  while (!all(mapply(nodes, starting_nodes,
-                     FUN = same_ends_in_Z))) {
-
+  # print(node)
+  while (!ends_in_Z(node)) {
     dir <- step %% length(insts)
     dir <- ifelse(dir == 0, length(insts), dir)
-
-    # node <- map[[node]][insts[dir]]
-    nodes <- sapply(nodes, \(x) map[[x]][insts[dir]])
-
-    if (step %% 1000000 == 0) print(unname(nodes))
-
+    node <- map[[node]][insts[dir]]
+    # print(node)
     step <- step + 1
-
-    # if (any(mapply(nodes, starting_nodes,
-    #                FUN = same_ends_in_Z))) {
-    #   step_list <- c(step_list, step)
-    #   print(step_list)
-    #   if (length(step_list) == length(starting_nodes)) return(step_list)
-    # }
   }
   return(step - 1)
 }
 
-x <- walk_network_2(insts_parsed, lines_parsed)
-
-starts <- names(lines_parsed)[starting_points_id]
-ends <- sapply(starts, function(x) {
-  splitted <- strsplit(x, "") |> unlist()
-  splitted[3] <- "Z"
-  paste0(splitted, collapse = "")
-}, simplify = F) |> unlist() |> unname()
-
-mapply(FUN = walk_network, start = starts[1], end = ends[1])
+x <- sapply(FUN = walk_network_3, X = starts)
+DescTools::LCM(x)
