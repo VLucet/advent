@@ -14,8 +14,6 @@ test_input <- c(
 
 # Part 1
 
-# input <- test_input
-
 parsed <-
   sapply(input, simplify = F, USE.NAMES = F,
          \(x) sapply(unlist(strsplit(x, " ")), as.numeric, simplify = T, USE.NAMES = F))
@@ -39,26 +37,11 @@ mapply(parsed_derived, parsed,
 
 # Part 2
 
-# input <- test_input
+parsed_2 <- sapply(parsed, rev, simplify = F, USE.NAMES = F)
 
-parsed <-
-  sapply(input, simplify = F, USE.NAMES = F,
-         \(x) sapply(unlist(strsplit(x, " ")), as.numeric, simplify = T, USE.NAMES = F))
-head(parsed)
+parsed_derived_2 <- sapply(parsed_2, derive_to_0)
 
-derive_to_0 <- function(x) {
-  deriv_list <- list()
-  while (!all(x == 0)) {
-    x <- diff(x)
-    deriv_list <- append(deriv_list, list(x))
-  }
-  return(deriv_list)
-}
-
-parsed_derived <- sapply(parsed, derive_to_0)
-head(parsed_derived)
-
-mapply(parsed_derived, parsed,
+mapply(parsed_derived_2, parsed_2,
        FUN = \(x, y) rev(y)[1] + rev(cumsum(sapply(x, \(x) rev(x)[1])))[1]) |>
   sum()
 
