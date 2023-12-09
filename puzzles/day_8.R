@@ -168,4 +168,5 @@ walk_network_3 <- function(start = "AAA",
 }
 
 x <- sapply(FUN = walk_network_3, X = starts)
+options(scipen=999)
 DescTools::LCM(x)
