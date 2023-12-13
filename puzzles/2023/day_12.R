@@ -1,8 +1,8 @@
 library(advent)
 
-input <- get_puzzle_input(2023,12)
+# input <- get_puzzle_input(2023,12)
 
-stopifnot(length(input) == 1000)
+# stopifnot(length(input) == 1000)
 
 test_input <- c(
   "???.### 1,1,3
@@ -15,7 +15,9 @@ test_input <- c(
 
 # -------------------------------------------------------------------------
 
-# input <- test_input
+input <- test_input
+
+# -------------------------------------------------------------------------
 
 parse <- function(the_line) {
   # browser()
@@ -23,12 +25,7 @@ parse <- function(the_line) {
   splitted_sign <- strsplit(splitted[1], "") |> unlist()
   splitted_groups <- strsplit(splitted[2], ",") |> unlist() |> as.numeric()
   list(sign = splitted[1],
-       l = length(splitted_sign),
-       n_missing = sum(splitted_sign == "?"),
-       n_broken = sum(splitted_sign == "#"),
-       n_working = sum(splitted_sign == "."),
        g_broken = splitted_groups,
-       g_broken_sum = sum(splitted_groups),
        g_remain = length(splitted_sign) - sum(splitted_groups),
        g_empty = length(splitted_groups) + 1)
 }
@@ -90,6 +87,42 @@ build_strings <- function(line_dat) {
   line_dat$strings <- strs
   line_dat
 }
+
+parsed_with_strs <- lapply(parsed_with_combs, build_strings)
+str(parsed_with_strs[[1]])
+
+lapply(parsed_with_strs, \(x) x[["strings"]]) |> unlist() |> length()
+
+# -------------------------------------------------------------------------
+
+library(parallel)
+
+n.cores <- detectCores()
+n.cores
+
+parse_2 <- function(the_line) {
+  # browser()
+  splitted <- strsplit(the_line, " ") |> unlist()
+
+  splitted[1] <- paste0(rep(splitted[1], 5), collapse = "?")
+  splitted[2] <- paste0(rep(splitted[2], 5), collapse = ",")
+
+  splitted_sign <- strsplit(splitted[1], "") |> unlist()
+  splitted_groups <- strsplit(splitted[2], ",") |> unlist() |> as.numeric()
+  list(sign = splitted[1],
+       g_broken = splitted_groups,
+       g_remain = length(splitted_sign) - sum(splitted_groups),
+       g_empty = length(splitted_groups) + 1)
+}
+
+parsed <- sapply(input, parse_2, USE.NAMES = F, simplify = F)
+str(parsed[[1]])
+
+clust <- makeCluster(n.cores - 2)
+clusterExport(clust, "parsed")
+
+parsed_with_combs <- parLapply(clust, parsed, fun = compute_combinations)
+str(parsed_with_combs[[2]])
 
 parsed_with_strs <- lapply(parsed_with_combs, build_strings)
 str(parsed_with_strs[[1]])
