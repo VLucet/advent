@@ -5,7 +5,7 @@ test_input <-
 
 input <- readLines("inputs/2023/day_15.txt")
 
-parsed <- sapply(test_input, \(x) strsplit(x, ",") |> unlist(),
+parsed <- sapply(input, \(x) strsplit(x, ",") |> unlist(),
                  USE.NAMES = F, simplify = F)  |> unlist()
 
 to_asci <- \(x) strtoi(charToRaw(x), 16L)
@@ -34,7 +34,7 @@ parsed_split <- sapply(parsed, strsplit, "[=-]",
 
 box_list <- list()
 
-for (i in 1:length(parsed_split)) {
+for (i in 1:(length(parsed_split))) {
   inst <- parsed_split[[i]]
   inst_num <- parsed_num[[i]]
 
@@ -49,7 +49,7 @@ for (i in 1:length(parsed_split)) {
     }
   } else {
     if (inst[1] %in% names(the_box)) {
-      the_box[[inst]] <- inst[2]
+      the_box[[inst[1]]] <- inst[2]
     } else {
       the_box[[inst[1]]] <- inst[2]
     }
@@ -62,8 +62,7 @@ box_list <- Filter(\(x) length(x) > 0, box_list)
 sapply(1:length(box_list), function(x) {
   # browser()
   the_box <- box_list[x]
-  base_mult <- as.numeric(names(the_box))
+  base_mult <- as.numeric(names(the_box)) + 1
   slots <- 1:length(the_box[[1]])
-  slots * as.numeric(unlist(the_box[[1]]))
-
-})
+  base_mult * (slots * as.numeric(unlist(the_box[[1]])))
+})  |> unlist()  |> sum()
